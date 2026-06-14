@@ -219,3 +219,4 @@ __marimo__/
 *.csv
 /.vscode
 /cache
+data/

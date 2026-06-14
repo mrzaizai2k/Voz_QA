@@ -11,3 +11,5 @@ python-louvain==0.16
 scikit-learn==1.3.2
 pyyaml
 openai
+aiohttp
+streamlit
