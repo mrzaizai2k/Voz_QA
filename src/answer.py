@@ -370,9 +370,8 @@ class ThreadQA:
         lines: list[str] = []
         for _, row in df.head(max_posts).iterrows():
             author = row.get("author_username", "Unknown")
-            date   = row.get("created_date",    "")
             text   = row.get("content_text",    "")
-            lines.append(f"[{date}] {author}: {text}")
+            lines.append(f"[{author}: {text}")
         return "\n".join(lines)
 
 
