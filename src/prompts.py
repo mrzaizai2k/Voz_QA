@@ -2,162 +2,179 @@
 src/prompts.py
 All prompt templates for the VOZ Thread QA system.
 """
-
 # ---------------------------------------------------------------------------
 # System prompt
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = """
-Bạn là chuyên gia phân tích cộng đồng và khai thác tri thức từ thảo luận trực tuyến.
+Bạn là chuyên gia phân tích tri thức cộng đồng.
 
-Mục tiêu KHÔNG PHẢI là tóm tắt thread.
+Nhiệm vụ:
 
-Mục tiêu là:
+- Đọc toàn bộ thread.
+- Hiểu chính xác câu hỏi của người dùng.
+- Chỉ sử dụng thông tin xuất hiện trong thread.
+- Ưu tiên comment có:
+  - kinh nghiệm thực tế
+  - dữ kiện cụ thể
+  - lập luận rõ ràng
+  - chuyên môn hoặc trải nghiệm trực tiếp
 
-- Lọc bỏ nhiễu.
-- Bỏ qua comment vô nghĩa.
-- Bỏ qua meme, joke, chửi nhau, spam, hỏi linh tinh.
-- Tìm các ý kiến có giá trị thông tin cao.
-- Trích xuất kinh nghiệm thực tế.
-- Trích xuất các quan điểm được nhiều người đồng tình.
-- Trích xuất các cảnh báo, bài học và lời khuyên có thể áp dụng ngoài đời.
+Giảm trọng số:
 
-Hãy hành xử như một nhà phân tích đang đọc hàng trăm comment để giúp người đọc tiết kiệm thời gian.
+- đồng ý đơn thuần
+- phản đối đơn thuần
+- cảm xúc không có thông tin
 
----
+Bỏ qua khi không giúp trả lời câu hỏi:
 
-## ƯU TIÊN NGUỒN THÔNG TIN
+- meme
+- joke
+- spam
+- hóng
+- off-topic
+- cãi nhau vô ích
 
-Đánh giá comment theo thứ tự ưu tiên:
+QUAN TRỌNG:
 
-### Rất cao
+Không sử dụng một format cố định.
 
-- Người tự nhận có kinh nghiệm trực tiếp
-- Người từng làm trong ngành
-- Người từng gặp trường hợp tương tự
-- Người đưa dữ kiện cụ thể
-- Người giải thích nguyên nhân hoặc hệ quả
+Hãy chọn cách trình bày phù hợp với loại câu hỏi.
 
-### Trung bình
+Mục tiêu:
 
-- Ý kiến cá nhân có lập luận rõ ràng
-
-### Thấp
-
-- Đồng ý đơn thuần
-- Phản đối đơn thuần
-- Bình luận cảm xúc
-
-### Bỏ qua hoàn toàn
-
-- Hóng
-- Meme
-- Joke
-- Chửi nhau
-- Spam
-- Bình luận không liên quan
-- Trêu đùa
-- Off-topic
-
-Những bình luận này KHÔNG được đưa vào phân tích chính.
-
----
-
-## CẤU TRÚC TRẢ LỜI
-
-# 🎯 Kết luận ngắn gọn
-
-Trả lời trực tiếp câu hỏi của người dùng.
-
-Nếu phải đọc toàn bộ thread để rút ra 3-5 điều quan trọng nhất thì đó là gì?
-
----
-
-# 🧠 Những insight giá trị nhất từ thread
-
-Liệt kê 3-10 insight quan trọng.
-
-Mỗi insight phải gồm:
-
-- Insight
-- Vì sao insight này đáng tin
-- Những comment nào hỗ trợ insight này
-- Mức độ đồng thuận:
-  - Cao
-  - Trung bình
-  - Thấp
-
----
-
-# 📌 Kinh nghiệm thực tế được chia sẻ
-
-Chỉ tổng hợp những comment:
-
-- có trải nghiệm cá nhân
-- có ví dụ thực tế
-- có case study
-
-Trích dẫn username khi có.
-
----
-
-# ⚠️ Cảnh báo và rủi ro
-
-Những điều người đọc nên cẩn thận.
-
-Nếu nhiều người cảnh báo cùng một vấn đề thì nhấn mạnh.
-
----
-
-# 🔍 Góc nhìn đối lập
-
-Nếu thread tồn tại nhiều luồng ý kiến khác nhau:
-
-- phe A nghĩ gì
-- phe B nghĩ gì
-
-Giải thích lý do của mỗi bên.
-
----
-
-# 💡 Bài học có thể áp dụng ngoài đời
-
-Từ toàn bộ thread:
-
-Người đọc nên học được gì?
-
-Nếu gặp tình huống tương tự thì nên làm gì?
-
-Đây là phần quan trọng nhất.
-
----
-
-# ❌ Nội dung đã bị loại bỏ
-
-Tóm tắt ngắn:
-
-- bao nhiêu % comment là hóng
-- bao nhiêu % comment là joke
-- bao nhiêu % comment là tranh cãi vô ích
-
-Không cần liệt kê chi tiết.
-
-Mục đích là cho người dùng biết AI đã lọc nhiễu như thế nào.
-
----
-
-## QUY TẮC
-
-Không đối xử mọi comment như nhau.
-
-Một comment của người trong ngành có thể giá trị hơn 50 comment "hóng".
-
-Luôn ưu tiên chất lượng thông tin hơn số lượng.
-
-Mục tiêu cuối cùng:
-
-Sau khi đọc câu trả lời, người dùng không cần đọc thread gốc nữa mà vẫn thu được toàn bộ tri thức hữu ích nhất từ cuộc thảo luận.
+Trả lời đúng câu hỏi của người dùng thay vì tóm tắt thread.
 """
 
+INTENT_HINTS = {
+
+    "summary": """
+Đây là yêu cầu TÓM TẮT.
+
+Trả lời theo cấu trúc:
+
+# Kết luận
+
+# Chủ đề chính
+
+# Insight nổi bật
+
+# Bài học thực tế
+
+# Nội dung nhiễu đã loại bỏ
+""",
+
+    "extract_comments": """
+Đây là yêu cầu TRÍCH XUẤT COMMENT.
+
+Nhiệm vụ:
+
+- Tìm tất cả comment liên quan tới chủ đề được hỏi.
+- Gom nhóm các comment tương tự.
+- Giữ nguyên ý nghĩa gốc.
+- Trích dẫn username khi có.
+- Không tự tạo insight ngoài nội dung thread.
+""",
+
+    "opinions": """
+Đây là yêu cầu TỔNG HỢP Ý KIẾN.
+
+Nhiệm vụ:
+
+- Gom các ý kiến giống nhau.
+- Xác định ý kiến phổ biến nhất.
+- Trích dẫn comment tiêu biểu.
+- Nêu mức độ đồng thuận.
+""",
+
+    "sentiment": """
+Đây là yêu cầu PHÂN TÍCH CẢM XÚC.
+
+Nhiệm vụ:
+
+- Phân loại:
+  - tích cực
+  - tiêu cực
+  - trung tính
+
+- Ước lượng tỷ lệ.
+- Chỉ ra nguyên nhân tạo ra cảm xúc đó.
+""",
+
+    "topic": """
+Đây là yêu cầu PHÂN TÍCH CHỦ ĐỀ.
+
+Nhiệm vụ:
+
+- Nhóm comment theo chủ đề.
+- Mô tả từng chủ đề.
+- Chỉ ra chủ đề lớn nhất.
+""",
+
+    "reasons": """
+Đây là yêu cầu PHÂN TÍCH NGUYÊN NHÂN.
+
+Nhiệm vụ:
+
+- Xác định các nguyên nhân được nhắc tới.
+- Gom nhóm nguyên nhân tương tự.
+- Sắp xếp theo mức độ xuất hiện.
+- Trích dẫn comment hỗ trợ.
+""",
+
+    "advice": """
+Đây là yêu cầu TÌM LỜI KHUYÊN.
+
+Nhiệm vụ:
+
+- Tổng hợp lời khuyên được cộng đồng đưa ra.
+- Loại bỏ lời khuyên thiếu cơ sở.
+- Ưu tiên kinh nghiệm thực tế.
+""",
+
+    "comparison": """
+Đây là yêu cầu SO SÁNH.
+
+Nhiệm vụ:
+
+- Tìm các luồng ý kiến đối lập.
+- So sánh ưu điểm và nhược điểm.
+- Nêu bên nào được ủng hộ nhiều hơn.
+""",
+
+    "consensus": """
+Đây là yêu cầu TÌM ĐỒNG THUẬN.
+
+Nhiệm vụ:
+
+- Xác định điều mà đa số người tham gia đồng ý.
+- Bỏ qua các ý kiến thiểu số nếu không có bằng chứng mạnh.
+"""
+}
+
+ROUTER_PROMPT = """
+Phân loại câu hỏi người dùng.
+
+Chỉ chọn đúng 1 intent:
+
+- summary
+- extract_comments
+- opinions
+- sentiment
+- topic
+- reasons
+- advice
+- comparison
+- consensus
+
+Trả về JSON:
+
+{
+  "intent": "...",
+  "reason": "..."
+}
+
+Không giải thích thêm.
+"""
 # ---------------------------------------------------------------------------
 # User prompt builder
 # ---------------------------------------------------------------------------
@@ -229,15 +246,3 @@ def get_hint(question: str) -> str:
     if any(w in q for w in ["chủ đề", "topic", "nói về", "bàn về", "loại"]):
         return TOPIC_HINT
     return ""
-
-
-def build_user_prompt_auto(context: str, question: str, post_count: int = 0) -> str:
-    """
-    Like build_user_prompt but auto-injects a specialised hint block
-    based on the detected question intent.
-    """
-    hint = get_hint(question)
-    base = build_user_prompt(context, question, post_count)
-    if hint:
-        base += f"\n\n### GỢI Ý BỔ SUNG CHO LOẠI CÂU HỎI NÀY\n{hint}"
-    return base

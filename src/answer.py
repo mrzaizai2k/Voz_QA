@@ -14,7 +14,9 @@ from openai import AsyncOpenAI
 import json
 
 from src.crawler import AsyncThreadCrawler
-from src.prompts import SYSTEM_PROMPT, build_user_prompt_auto
+from src.prompts import SYSTEM_PROMPT, INTENT_HINTS
+
+from src.router import detect_intent
 
 load_dotenv()
 
@@ -26,6 +28,38 @@ logger = logging.getLogger(__name__)
 
 CSV_OUTPUT_DIR = Path("output")
 
+
+async def build_prompt(
+        llm,
+        context,
+        question,
+        post_count
+    ):
+
+        intent = await detect_intent(
+            llm,
+            question
+        )
+
+        hint = INTENT_HINTS.get(intent, "")
+
+        meta = f"""
+    Intent: {intent}
+
+    Posts supplied: {post_count}
+    """
+
+        return (
+            meta
+            + "\n\n"
+            + hint
+            + "\n\n"
+            + "### THREAD\n"
+            + context
+            + "\n\n"
+            + "### USER QUESTION\n"
+            + question
+        )
 
 # ---------------------------------------------------------------------------
 # Base LLM — stream() yields chunks; chat() collects them for convenience
@@ -276,9 +310,12 @@ class ThreadQA:
             return
 
         context     = self._build_context(posts_df)
-        user_prompt = build_user_prompt_auto(
-            context, question, post_count=len(posts_df)
-        )
+        user_prompt = await build_prompt(
+                self.llm,
+                context,
+                question,
+                post_count=len(posts_df)
+            )
         logger.info("Bắt đầu stream câu trả lời từ LLM ...")
 
         async for chunk in self.llm.stream(SYSTEM_PROMPT, user_prompt):
