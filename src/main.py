@@ -107,7 +107,7 @@ section[data-testid="stSidebar"] .stButton > button {
     text-align: left !important;
     border-radius: 6px !important;
     padding: 8px 12px !important;
-    width: 80% !important;
+    width: 300px !important;
     display: block !important;
     transition: border-color 0.15s, background 0.15s !important;
     white-space: nowrap;
@@ -586,7 +586,15 @@ else:
 st.markdown('<div class="input-area-spacer"></div>', unsafe_allow_html=True)
 
 # Restore last used URL for this chat so user doesn't need to re-enter it
+# Restore last used URL for this chat so user doesn't need to re-enter it
 last_voz_url = chat.get("voz_url", "")
+
+# Force the widget to show the chat's saved URL.
+# We track which chat was last loaded; if it changed (user clicked history),
+# we overwrite the widget's session-state value before it renders.
+if st.session_state.get("_loaded_chat_id") != st.session_state.active_chat_id:
+    st.session_state["thread_url_widget"] = last_voz_url
+    st.session_state["_loaded_chat_id"] = st.session_state.active_chat_id
 
 with st.container():
     # Row 1: URL input (full width)
